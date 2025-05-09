@@ -2,7 +2,6 @@
 
 import { CartItem, Product } from "@/lib/products";
 import { createContext, useContext, useState } from "react";
-import { uid } from "uid";
 
 interface CartContextType {
   cart: CartItem[];
@@ -10,10 +9,11 @@ interface CartContextType {
   setIsCartOpen: (isOpen: boolean) => void;
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: (isOpen: boolean) => void;
-  addToCart: (item: Product) => void;
-  removeFromCart: (itemId: string) => void;
-  updateCartItemQuantity: (itemId: string, quantity: number) => void;
+  addToCart: (item: Product, quantity?: number) => void;
+  removeFromCart: (productName: string) => void;
+  updateCartItemQuantity: (productName: string, quantity: number) => void;
 }
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function useCart() {
@@ -33,42 +33,35 @@ export default function CartProvider({
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, quantity?: number) => {
     setCart((prevCart) => {
-      // Check if the product is already in the cart
-      const existingItemIndex = prevCart.findIndex(
+      const existingIndex = prevCart.findIndex(
         (item) => item.product.name === product.name
       );
 
-      if (existingItemIndex !== -1) {
-        // Update quantity if product exists
+      if (existingIndex !== -1) {
         const updatedCart = [...prevCart];
-        updatedCart[existingItemIndex].quantity += 1;
+        updatedCart[existingIndex].quantity += quantity || 1;
         return updatedCart;
       } else {
-        const newItem: CartItem = {
-          itemId: uid(),
-          product,
-          quantity: 1,
-        };
-        return [...prevCart, newItem];
+        return [...prevCart, { product, quantity: quantity || 1 }];
       }
     });
   };
 
-  const removeFromCart = (itemId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.itemId !== itemId));
+  const removeFromCart = (productName: string) => {
+    setCart((prevCart) =>
+      prevCart.filter((item) => item.product.name !== productName)
+    );
   };
 
-  const updateCartItemQuantity = (itemId: string, quantity: number) => {
+  const updateCartItemQuantity = (productName: string, quantity: number) => {
     setCart((prevCart) => {
       if (quantity <= 0) {
-        // Remove item from cart
-        return prevCart.filter((item) => item.itemId !== itemId);
+        return prevCart.filter((item) => item.product.name !== productName);
       } else {
-        // Update quantity
         return prevCart.map((item) =>
-          item.itemId === itemId ? { ...item, quantity } : item
+          item.product.name === productName ? { ...item, quantity } : item
         );
       }
     });
@@ -84,5 +77,6 @@ export default function CartProvider({
     removeFromCart,
     updateCartItemQuantity,
   };
+
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

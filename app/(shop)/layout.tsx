@@ -1,3 +1,4 @@
+import AiChat from "@/components/AiChat";
 import { ShopHeader } from "@/components/ShopHeader";
 import CartProvider from "@/providers/CartProvider";
 import { ProductsProvider } from "@/providers/ProductsProvider";
@@ -13,6 +14,7 @@ export default function ShopLayout({
         <CartProvider>
           <ShopHeader />
           {children}
+          <AiChat />
         </CartProvider>
       </ProductsProvider>
     </main>

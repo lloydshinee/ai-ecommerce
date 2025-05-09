@@ -53,9 +53,9 @@ export function CartSidebar() {
               ) : (
                 <>
                   <div className="space-y-4 mb-8">
-                    {cart.map((item) => (
+                    {cart.map((item, i) => (
                       <motion.div
-                        key={item.itemId}
+                        key={i}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, height: 0 }}
@@ -79,7 +79,7 @@ export function CartSidebar() {
                             </span>
                             <button
                               className="text-red-500 text-sm"
-                              onClick={() => removeFromCart(item.itemId)}
+                              onClick={() => removeFromCart(item.product.name)}
                             >
                               Remove
                             </button>
@@ -90,7 +90,7 @@ export function CartSidebar() {
                               className="p-1 border rounded disabled:opacity-50"
                               onClick={() =>
                                 updateCartItemQuantity(
-                                  item.itemId,
+                                  item.product.name,
                                   item.quantity - 1
                                 )
                               }
@@ -105,7 +105,7 @@ export function CartSidebar() {
                               className="p-1 border rounded"
                               onClick={() =>
                                 updateCartItemQuantity(
-                                  item.itemId,
+                                  item.product.name,
                                   item.quantity + 1
                                 )
                               }
@@ -117,7 +117,6 @@ export function CartSidebar() {
                       </motion.div>
                     ))}
                   </div>
-
                   <div className="border-t pt-4">
                     <div className="flex justify-between mb-2">
                       <span>Subtotal</span>
